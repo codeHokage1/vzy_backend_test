@@ -1,6 +1,8 @@
 const router = require("express").Router();
+const {isLoggedin} = require("../middlewares/auth")
 
 router
+	.use(isLoggedin)
 	.get("/", (req, res) => {
 		res.send("Yeah. Na your details be this");
 	})
