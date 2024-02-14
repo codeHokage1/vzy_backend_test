@@ -1,17 +1,12 @@
 const router = require("express").Router();
+const userController = require("../controllers/userController");
 const {isLoggedin} = require("../middlewares/auth")
+
 
 router
 	.use(isLoggedin)
-	.get("/", (req, res) => {
-		res.send("Yeah. Na your details be this");
-	})
-	.put("/", (req, res) => {
-		res.send("Update user for here");
-	})
-   .delete("/", (req, res) => {
-      res.send("Delete user for here");
-
-   });
+	.get("/", userController.getUserDetails)
+	.patch("/", userController.updateUserDetails)
+   .delete("/", userController.deleteUser);
 
 module.exports = router
