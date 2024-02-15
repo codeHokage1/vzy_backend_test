@@ -5,7 +5,7 @@ const {isLoggedin} = require("../middlewares/auth");
 const paymentController = require("../controllers/paymentController");
 
 router
-	.post("/webhook", express.raw({ type: "application/json" }), paymentController.webhookFunc2)
+	.post("/webhook", express.raw({ type: "application/json" }), paymentController.webhookFunc)
 	.post("/subscribe", express.json(), isLoggedin, checkNewPaymentDetails, paymentController.pay)
 	.get("/success", paymentController.success);
 

@@ -2,9 +2,9 @@ const axios = require("axios");
 require("dotenv").config();
 
 const User = require("../models/User");
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Configure stripe with secret key
 
-exports.webhookFunc2 = async (request, response) => {
+exports.webhookFunc = async (request, response) => {
 	const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 	let event = request.body;
 	if (endpointSecret) {
@@ -22,25 +22,22 @@ exports.webhookFunc2 = async (request, response) => {
 		}
 	}
 
-	// Handle the event
+	// Handle and verify the event
 	switch (event.type) {
 		case "payment_intent.succeeded":
 			const paymentIntent = event.data.object;
 			console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`);
-			// console.log("Full details of the incoming event: ", event);
 
 			const userEmail = paymentIntent.receipt_email;
 			const foundUser = await User.findOne({ email: userEmail });
 			foundUser.subscription = "paid";
 			await foundUser.save();
+
 			console.log("User subscription updated to paid!");
-			// Then define and call a method to handle the successful payment intent.
-			// handlePaymentIntentSucceeded(paymentIntent);
 			break;
 		case "payment_method.attached":
 			const paymentMethod = event.data.object;
-			// Then define and call a method to handle the successful attachment of a PaymentMethod.
-			// handlePaymentMethodAttached(paymentMethod);
+			console.log(`PaymentMethod was attached to a Customer!`);
 			break;
 		default:
 			// Unexpected event type
@@ -63,6 +60,7 @@ exports.pay = async (req, res) => {
 
 		const { amount, currency } = req.body;
 
+		// Create a PaymentIntent with the order amount and currency
 		const paymentIntent = await stripe.paymentIntents.create({
 			amount,
 			currency: currency || "usd",
@@ -70,6 +68,7 @@ exports.pay = async (req, res) => {
 			metadata: { integration_check: "accept_a_payment" }
 		});
 
+		// Confirm the payment
 		const confirmPayment = await stripe.paymentIntents.confirm(paymentIntent.id, {
 			payment_method: "pm_card_visa",
 			return_url: process.env.PAYMENT_SUCCESS_URL

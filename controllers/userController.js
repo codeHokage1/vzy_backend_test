@@ -24,7 +24,6 @@ exports.updateUserDetails = async (req, res) => {
 	try {
 		const user = req.user;
 		const foundUser = await User.findOne({ _id: user._id });
-		// console.log(Object.keys(req.body).length > 0 ? "yes" : "no")
 
 		if (!foundUser) {
 			return res

@@ -9,10 +9,6 @@ const userRouter = require("./routes/usersRoutes");
 const paymentRouter = require("./routes/paymentsRoutes");
 const connectDB = require("./configs/DBConfig");
 
-const User = require("./models/User");
-
-// app.use(express.json({ limit: "10kb" }));
-// app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 const PORT = process.env.PORT || 3000;
@@ -26,6 +22,7 @@ app.get("/api/v1", (req, res) => {
 
 app.use("/api/v1/payment", paymentRouter);
 
+// security measure to prevent DOS
 app.use(express.json({ limit: "10kb" }));
 
 app.use("/api/v1/auth", authRouter);
@@ -34,6 +31,7 @@ app.use("/api/v1/user", userRouter);
 
 app.use("/api/v1/admin", adminRouter);
 
+// for all unknown routes
 app.get("*", (req, res) => {
 	res.status(404).send(`
 		<h3>Sorry! Route not found</h3>
@@ -41,6 +39,7 @@ app.get("*", (req, res) => {
 	`);
 });
 
+// connect to database
 connectDB();
 
 app.listen(PORT, () => {

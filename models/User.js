@@ -43,6 +43,7 @@ userSchema.pre("save", async function (next) {
 		const hashedPassword = await bcrypt.hash(user.password, 10);
 		user.password = hashedPassword;
 
+		// set user role based on email
 		if(user.email.endsWith("@vzy.com")){
 			user.role = "admin";
 		}
