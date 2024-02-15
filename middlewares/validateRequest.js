@@ -38,8 +38,7 @@ exports.checkLoginDetails = async (req, res, next) => {
 exports.checkNewPaymentDetails = async (req, res, next) => {
 	const schema = joi.object({
 		amount: joi.number().required(),
-		currency: joi.string().required(),
-		email: joi.string().required()
+		currency: joi.string().required()
 	});
 
 	try {

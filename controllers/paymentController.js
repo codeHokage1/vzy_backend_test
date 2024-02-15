@@ -6,7 +6,7 @@ const stripe = require("stripe")(
 	process.env.STRIPE_SECRET_KEY
 );
 
-exports.webhookFunc2 = (request, response) => {
+exports.webhookFunc2 = async (request, response) => {
 	const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 	let event = request.body;
 	if (endpointSecret) {
@@ -29,6 +29,13 @@ exports.webhookFunc2 = (request, response) => {
 		case "payment_intent.succeeded":
 			const paymentIntent = event.data.object;
 			console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`);
+			// console.log("Full details of the incoming event: ", event);
+
+			const userEmail = paymentIntent.receipt_email;
+			const foundUser = await User.findOne({ email: userEmail });
+			foundUser.subscription = "paid";
+			await foundUser.save();
+			console.log("User subscription updated to paid!");
 			// Then define and call a method to handle the successful payment intent.
 			// handlePaymentIntentSucceeded(paymentIntent);
 			break;
@@ -48,12 +55,20 @@ exports.webhookFunc2 = (request, response) => {
 
 exports.pay = async (req, res) => {
 	try {
-		const { amount, currency, email } = req.body;
+		const user = req.user;
+		if(user.subscription === "paid") {
+			return res.status(400).json({
+				message: "You already have a paid subscription!",
+				data: null
+			});
+		}
+
+		const { amount, currency } = req.body;
 
 		const paymentIntent = await stripe.paymentIntents.create({
 			amount,
 			currency: currency || "usd",
-			receipt_email: email,
+			receipt_email: user.email,
 			metadata: { integration_check: "accept_a_payment" }
 		});
 
@@ -62,6 +77,10 @@ exports.pay = async (req, res) => {
 			return_url: process.env.PAYMENT_SUCCESS_URL
 		});
 
+		// const foundUser = await User.findOne({ _id: user._id });
+		// foundUser.subscription = "paid";
+		// await foundUser.save();
+		
 		res.json({
 			message: "Payment created and successful!",
 			data: confirmPayment

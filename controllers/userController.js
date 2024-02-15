@@ -12,7 +12,7 @@ exports.getUserDetails = async (req, res) => {
 		}
 
 		res.status(200).json({
-			message: "User details found!",
+			message: "Your account details:",
 			data: foundUser
 		});
 	} catch (error) {
@@ -24,7 +24,7 @@ exports.updateUserDetails = async (req, res) => {
 	try {
 		const user = req.user;
 		const foundUser = await User.findOne({ _id: user._id });
-      // console.log(Object.keys(req.body).length > 0 ? "yes" : "no")
+		// console.log(Object.keys(req.body).length > 0 ? "yes" : "no")
 
 		if (!foundUser) {
 			return res
@@ -44,17 +44,15 @@ exports.updateUserDetails = async (req, res) => {
 		}
 
 		if (req.body.role && req.user.role !== "admin") {
-			return res
-				.status(403)
-				.json({
-					message: "You are not allowed to update your role! Kindly reach out to the admin"
-				});
+			return res.status(403).json({
+				message: "You are not allowed to update your role! Kindly reach out to the admin"
+			});
 		}
 
 		const updatedUser = await User.findOneAndUpdate({ _id: user._id }, req.body, { new: true });
 
 		res.status(200).json({
-			message: "User details updated!",
+			message: "Your details have been updated:",
 			data: updatedUser
 		});
 	} catch (error) {
@@ -76,7 +74,7 @@ exports.deleteUser = async (req, res) => {
 		const updatedUser = await User.findOneAndDelete({ _id: user._id });
 
 		res.status(200).json({
-			message: "User deleted from database!",
+			message: "Your account have been deleted!",
 			data: null
 		});
 	} catch (error) {
