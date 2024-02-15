@@ -18,7 +18,7 @@ app.use(cors());
 const PORT = process.env.PORT || 3000;
 
 app.get("/api/v1", (req, res) => {
-	res.send("Hello World!");
+	res.send("Vzy Assessment by Sdoiq Farhan - User Management & Subscription API!");
 });
 
 app.use("/api/v1/payment", paymentRouter);
@@ -32,10 +32,11 @@ app.use("/api/v1/user", userRouter);
 
 app.use("/api/v1/admin", adminRouter);
 
-// app.use("/api/v1/payment", paymentRouter);
-
 app.get("*", (req, res) => {
-	res.status(404).send("Endpoint not found!");
+	res.status(404).send(`
+		<h3>Sorry! Route not found</h3>
+		<p>Kindly check the URL and try again or go through the <a href="https://documenter.getpostman.com/view/23438041/2sA2r6XQ87" target="_blank">full API Doc</a>.</p>
+	`);
 });
 
 connectDB();

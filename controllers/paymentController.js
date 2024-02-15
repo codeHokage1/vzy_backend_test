@@ -77,7 +77,13 @@ exports.pay = async (req, res) => {
 
 		res.json({
 			message: "Payment created and successful!",
-			data: confirmPayment
+			data: {
+				amount: confirmPayment.amount,
+				payerEmail: confirmPayment.receipt_email,
+				confirmationMethod: confirmPayment.confirmation_method,
+				paymentMethod: confirmPayment.payment_method_types,
+				status: confirmPayment.status
+			}
 		});
 	} catch (error) {
 		res.status(500).json({
