@@ -18,13 +18,15 @@ app.use(cors());
 const PORT = process.env.PORT || 3000;
 
 app.get("/api/v1", (req, res) => {
-	res.send("Vzy Assessment by Sdoiq Farhan - User Management & Subscription API!");
+	res.send(`
+		<h1>Vzy Assessment by Sodiq Farhan - User Management & Subscription API!</h1>
+		<p>Kindly go through the <a href="https://documenter.getpostman.com/view/23438041/2sA2r6XQ87" target="_blank">full API Doc</a>.</p>
+	`);
 });
 
 app.use("/api/v1/payment", paymentRouter);
 
 app.use(express.json({ limit: "10kb" }));
-
 
 app.use("/api/v1/auth", authRouter);
 
