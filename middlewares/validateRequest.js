@@ -34,3 +34,18 @@ exports.checkLoginDetails = async (req, res, next) => {
 	}
 	next();
 };
+
+exports.checkNewPaymentDetails = async (req, res, next) => {
+	const schema = joi.object({
+		amount: joi.number().required(),
+		currency: joi.string().required(),
+		email: joi.string().required()
+	});
+
+	try {
+		const value = await schema.validateAsync(req.body)
+	} catch (error) {
+		return res.status(422).json({ message: error.details[0].message, data: null });
+	}
+	next();
+};

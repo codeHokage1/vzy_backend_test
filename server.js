@@ -11,8 +11,8 @@ const connectDB = require("./configs/DBConfig");
 
 const User = require("./models/User");
 
-app.use(express.json({ limit: "10kb" }));
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.json({ limit: "10kb" }));
+// app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 const PORT = process.env.PORT || 3000;
@@ -22,6 +22,8 @@ app.get("/api/v1", (req, res) => {
 });
 
 app.use("/api/v1/payment", paymentRouter);
+
+app.use(express.json({ limit: "10kb" }));
 
 
 app.use("/api/v1/auth", authRouter);

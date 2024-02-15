@@ -1,3 +1,4 @@
+const axios = require("axios");
 const User = require("../models/User");
 const stripe = require("stripe")(
 	"sk_test_51OjhvIGU7lzTBwYHYl12Lx0DzvpXYhIQUHVDJgLl4PxyUr63rBvpXUGNvzb7WKVrRyNipzoxXaG70RwevoDR77DV00KowN8uB7"
@@ -116,18 +117,22 @@ exports.webhookFunc = async (request, response) => {
 	response.json({ received: true });
 };
 
-
-
 exports.webhookFunc2 = (request, response) => {
-   const endpointSecret = '';
+	const endpointSecret = "whsec_mhQ7RTB2UV2xGwkX0fQ72Bp8t0GLbvAC";
 	let event = request.body;
+	// console.log("Event is:", request.body);
+	// console.log("Event Rawbody is:", request.body.toString('utf-8'));
 	// Only verify the event if you have an endpoint secret defined.
 	// Otherwise use the basic event deserialized with JSON.parse
 	if (endpointSecret) {
 		// Get the signature sent by Stripe
 		const signature = request.headers["stripe-signature"];
 		try {
-			event = stripe.webhooks.constructEvent(request.body, signature, endpointSecret);
+			event = stripe.webhooks.constructEvent(
+				request.body.toString("utf-8"),
+				signature,
+				endpointSecret
+			);
 		} catch (err) {
 			console.log(`⚠️  Webhook signature verification failed.`, err.message);
 			return response.sendStatus(400);
@@ -138,6 +143,7 @@ exports.webhookFunc2 = (request, response) => {
 	switch (event.type) {
 		case "payment_intent.succeeded":
 			const paymentIntent = event.data.object;
+			console.log("Event is:", event);
 			console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`);
 			// Then define and call a method to handle the successful payment intent.
 			// handlePaymentIntentSucceeded(paymentIntent);
@@ -155,3 +161,38 @@ exports.webhookFunc2 = (request, response) => {
 	// Return a 200 response to acknowledge receipt of the event
 	response.send();
 };
+
+exports.pay = async (req, res) => {
+	try {
+		const { amount, currency, email } = req.body;
+
+		const paymentIntent = await stripe.paymentIntents.create({
+			amount,
+			currency: currency || "usd",
+			receipt_email: email,
+			metadata: { integration_check: "accept_a_payment" }
+		});
+
+		const confirmPayment = await stripe.paymentIntents.confirm(paymentIntent.id, {
+			payment_method: "pm_card_visa",
+			return_url: "https://7c07-105-113-94-130.ngrok-free.app/api/v1/payment/success"
+		});
+
+		res.json({
+			message: "Payment created",
+			data: paymentIntent
+		});
+	} catch (error) {
+		res.status(500).json({
+			status: "fail",
+			message: error.message
+		});
+	}
+};
+
+exports.success = (req, res) => {
+	res.status(200).json({
+		message: "Payment successful",
+		data: null
+	});
+}
