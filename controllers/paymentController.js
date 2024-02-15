@@ -2,9 +2,7 @@ const axios = require("axios");
 require("dotenv").config();
 
 const User = require("../models/User");
-const stripe = require("stripe")(
-	process.env.STRIPE_SECRET_KEY
-);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 exports.webhookFunc2 = async (request, response) => {
 	const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -56,7 +54,7 @@ exports.webhookFunc2 = async (request, response) => {
 exports.pay = async (req, res) => {
 	try {
 		const user = req.user;
-		if(user.subscription === "paid") {
+		if (user.subscription === "paid") {
 			return res.status(400).json({
 				message: "You already have a paid subscription!",
 				data: null
@@ -77,10 +75,6 @@ exports.pay = async (req, res) => {
 			return_url: process.env.PAYMENT_SUCCESS_URL
 		});
 
-		// const foundUser = await User.findOne({ _id: user._id });
-		// foundUser.subscription = "paid";
-		// await foundUser.save();
-		
 		res.json({
 			message: "Payment created and successful!",
 			data: confirmPayment
@@ -98,4 +92,4 @@ exports.success = (req, res) => {
 		message: "Payment successful",
 		data: null
 	});
-}
+};
