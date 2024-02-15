@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 exports.registerUser = async (req, res) => {
 	try {
 		const user = req.body;
-		if (user.role && user.email !== "farhan@admin.com") {
+		if (user.role && !user.email.endsWith("@vzy.com")) {
 			user.role = "user";
 		}
 
@@ -18,10 +18,10 @@ exports.registerUser = async (req, res) => {
 		res.status(201).json({
 			message: "User created successfully!",
 			data: {
-				_id: foundUser._id,
-				email: foundUser.email,
-				role: foundUser.role,
-				subscription: foundUser.subscription
+				_id: newUser._id,
+				email: newUser.email,
+				role: newUser.role,
+				subscription: newUser.subscription
 			},
 			token
 		});
